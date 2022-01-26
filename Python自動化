@@ -84,7 +84,7 @@ driver.implicitly_wait(15)
 q1=driver.find_element_by_id('ctl00_ctl00_MainContent_MainContent_txtPatID')
 q1.send_keys('')
 q2=driver.find_element_by_id('ctl00_ctl00_MainContent_MainContent_txtTelNo')
-q2.send_keys('0921683600')
+q2.send_keys('')
 q3=driver.find_element_by_id('ctl00_ctl00_MainContent_MainContent_txtPatientName')
 q3.send_keys('')
 
