@@ -1,0 +1,107 @@
+
+from selenium import webdriver
+import time
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+import webbrowser
+import requests
+
+
+
+def send_notify(token, msg, filepath=None, stickerPackageId=None, stickerId=None):
+    payload = {'message': msg}
+    headers = {
+        "Authorization": "Bearer " + token
+     }
+    if stickerPackageId and stickerId:
+        payload['stickerPackageId'] = stickerPackageId
+        payload['stickerId'] = stickerId
+
+    if filepath:
+        attachment = {'imageFile': open(filepath, 'rb')}
+        print(attachment)
+        r = requests.post("https://notify-api.line.me/api/notify", headers=headers, params=payload, files=attachment)
+    else:
+        print("attachment")
+        r = requests.post("https://notify-api.line.me/api/notify", headers=headers, params=payload)
+    return r.status_code, r.text
+    
+token = "**********"
+
+hhh=int(time.strftime("%H", time.localtime()) )
+mmm=int(time.strftime("%M", time.localtime()) )
+sss=int(time.strftime("%S", time.localtime()) )
+   
+driver = webdriver.Chrome(r'/Users/changchiaruei/Downloads/chromedriver')
+
+for se in range(0,100):
+    print("第"+str(se)+"次重新整理  現在時間："+str(hhh)+":"+str(mmm)+":"+str(sss))
+    time.sleep(2)
+    driver.implicitly_wait(15)
+    driver.get("*************")
+    
+    
+    driver.execute_script("javascript:DoSubmit('MainUI.aspx','1A','新冠肺炎疫苗');")
+    raw = driver.page_source
+    beg_num=-1
+    including_java=[]
+    java_target=[]
+    
+    
+    for i in range(0,100):
+        a=raw.find("javascript:DoSubmit",beg_num+1,len(raw))
+        if a==-1:
+            break
+        including_java.append(a)
+        beg_num=a
+    
+    for i in range(0,len(including_java)):
+        aaa=0
+        for x in range(0,100):
+            for z in range(including_java[i]+x,100):
+                if raw[z] ==  "\"" :
+                     java_target.append(raw[including_java[i]:z])
+                     aaa=aaa+1
+                     break
+            if aaa>=1:
+                break
+    a=0 
+    for i in java_target:
+        if "新冠疫苗第二劑" in str(i) :
+            if "2021/10/04" in str(i) :
+                a=a+1
+                text=str(i)[20:-2]
+                driver.implicitly_wait(15)
+                driver.execute_script('javascript:DoSubmit('+str(text)+')')
+                break
+    if a>0:
+        break
+    
+    
+driver.implicitly_wait(15)   
+q1=driver.find_element_by_id('ctl00_ctl00_MainContent_MainContent_txtPatID')
+q1.send_keys('')
+q2=driver.find_element_by_id('ctl00_ctl00_MainContent_MainContent_txtTelNo')
+q2.send_keys('0921683600')
+q3=driver.find_element_by_id('ctl00_ctl00_MainContent_MainContent_txtPatientName')
+q3.send_keys('')
+
+js = "document.getElementById('ctl00_ctl00_MainContent_MainContent_txtBirthday').removeAttribute('readonly')"
+driver.execute_script(js)
+
+q4=driver.find_element_by_id('ctl00_ctl00_MainContent_MainContent_txtBirthday')
+q4.send_keys('')
+q5=driver.find_element_by_id('ctl00_ctl00_MainContent_MainContent_txtAddress')
+q5.send_keys('')
+q6=driver.find_element_by_id('ctl00_ctl00_MainContent_MainContent_rbn_covid_qaN').click()
+
+q8=driver.find_element_by_id('ctl00_ctl00_MainContent_MainContent_rbn_AzSec_Y').click()
+
+q7=driver.find_element_by_id('ctl00_ctl00_MainContent_MainContent_btnSubmit').click()
+
+driver.implicitly_wait(15)  
+qf_1=driver.find_element_by_id('ctl00_ctl00_MainContent_MainContent_btnConfirm').click()
+
+send_notify(token=token, msg='', filepath='')
